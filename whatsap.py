@@ -7,71 +7,71 @@ import threading
 import time
 import os
 import re
-import random
-import string
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+استيراد عشوائي
+استيراد سلسلة
+استيراد smtplib
+من مكتبة البريد الإلكتروني MIME.text استورد MIMEText
+من مكتبة البريد الإلكتروني MIME.multipart استورد MIMEMultipart
 from functools import wraps
-from datetime import datetime, timedelta
+من datetime استورد datetime و timedelta
 
 # ====== إعدادات التسجيل ======
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
+logging.basicConfig (​
+    format= '%(asctime)s - %(name)s - %(levelname)s - %(message)s' ,
+    مستوى التسجيل. معلومات
 )
-logger = logging.getLogger(__name__)
+logger = logging.getLogger ( __ name__ )
 
 # ====== إعدادات البوت ======
 TELEGRAM_TOKEN = '8556747289:AAGhbOEYXkeC7_kQYQtzOKny8usWSlKpMqI'
-ADMIN_USERNAME = '@x_f7x'
+اسم المستخدم الإداري = '@x_f7x'
 ADMIN_PASSWORD = '@x_f7x'
-ADMIN_USER_IDS = []
+ADMIN_USER_IDS = [ ]
 
-# ====== إعداد Flask ======
-app = Flask(__name__)
-app.secret_key = 'x_f7x_secret_key_2024'
-app.config['SESSION_TYPE'] = 'filesystem'
+# ====== قارورة التحضير ======
+app = Flask ( __name__ )
+app.secret_key = ' x_f7x_secret_key_2024 '
+app.config [ 'SESSION_TYPE' ] = ' filesystem'
 
 # ====== إعداد قاعدة البيانات ======
-def setup_database():
+def  setup_database ( ) :
     """إعداد قاعدة البيانات من جديد"""
-    conn = sqlite3.connect('banned.db')
-    c = conn.cursor()
+    conn = sqlite3.connect ( 'banned.db ' )
+    c = conn.cursor ( )
     
-    # حذف الجداول القديمة إذا كانت موجودة
-    c.execute("DROP TABLE IF EXISTS banned_numbers")
-    c.execute("DROP TABLE IF EXISTS admins")
-    c.execute("DROP TABLE IF EXISTS report_logs")
-    c.execute("DROP TABLE IF EXISTS email_reports")
-    c.execute("DROP TABLE IF EXISTS payments")
-    c.execute("DROP TABLE IF EXISTS subscriptions")
-    c.execute("DROP TABLE IF EXISTS users")
-    c.execute("DROP TABLE IF EXISTS settings")
+    #حذف القوائم القديمة إذا كانت موجودة
+    ج. تنفيذ ( "DROP TABLE IF EXISTS ban_numbers" )
+    ج. تنفيذ ( "DROP TABLE IF EXISTS admins" )
+    ج. تنفيذ ( "DROP TABLE IF EXISTS report_logs" )
+    ج. تنفيذ ( "DROP TABLE IF EXISTS email_reports" )
+    ج. تنفيذ ( "DROP TABLE IF EXISTS payments" )
+    ج. تنفيذ ( "DROP TABLE IF EXISTS subscriptions" )
+    ج. تنفيذ ( "DROP TABLE IF EXISTS users" )
+    ج. تنفيذ ( "DROP TABLE IF EXISTS settings" )
     
-    # إنشاء الجداول من جديد
-    c.execute('''CREATE TABLE banned_numbers
-                 (number TEXT PRIMARY KEY, 
-                  reason TEXT, 
-                  banned_by TEXT, 
-                  date TEXT,
-                  report_count INTEGER DEFAULT 1)''')
+    # إنشاء قواعد البيانات من جديد
+    ج. تنفيذ ( '''إنشاء جدول الأرقام المحظورة
+                 (الرقم النص المفتاح الأساسي،
+                  نص السبب،
+                  ممنوع بواسطة نص،
+                  التاريخ النصي،
+                  report_count INTEGER DEFAULT 1)''' )
     
-    c.execute('''CREATE TABLE admins
-                 (user_id TEXT PRIMARY KEY, 
-                  username TEXT, 
-                  added_by TEXT, 
-                  date TEXT)''')
+    ج. تنفيذ ( '''إنشاء جدول المسؤولين
+                 (user_id TEXT PRIMARY KEY,
+                  اسم المستخدم نص،
+                  تمت الإضافة بواسطة نص،
+                  التاريخ (نص)''' )
     
-    c.execute('''CREATE TABLE report_logs
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                  number TEXT, 
-                  action TEXT, 
-                  performed_by TEXT, 
-                  date TEXT,
-                  platform TEXT DEFAULT 'telegram')''')
+    ج. تنفيذ ( '''إنشاء جدول سجلات_التقارير
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  نص رقمي،
+                  نص الإجراء،
+                  تم التنفيذ بواسطة نص،
+                  التاريخ النصي،
+                  platform TEXT DEFAULT 'telegram')''' )
     
-    c.execute('''CREATE TABLE email_reports
+    ج. تنفيذ ( '''إنشاء جدول email_reports
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   number TEXT,
                   email TEXT,
